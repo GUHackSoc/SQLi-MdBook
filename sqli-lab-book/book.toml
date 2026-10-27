@@ -1,0 +1,16 @@
+[book]
+title = "SQL Injection Lab: A Beginner's Guide"
+authors = ["Callum"]
+description = "A hands on, local only lab teaching SQL Injection, incorrect fixes, and secure parameterized queries."
+language = "en"
+src = "src"
+
+[output.html]
+default-theme = "navy"
+git-repository-url = ""
+no-section-label = false
+additional-css = []
+
+[output.html.fold]
+enable = true
+level = 0
