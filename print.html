@@ -1,0 +1,1373 @@
+<!DOCTYPE HTML>
+<html lang="en" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>SQL Injection Lab: A Beginner&#x27;s Guide</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="A hands on, local only lab teaching SQL Injection, incorrect fixes, and secure parameterized queries.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-e96d0476.css">
+        <link rel="stylesheet" href="css/chrome-d279d366.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "navy";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-e16ccd71.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-8e74c463.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">SQL Injection Lab: A Beginner&#x27;s Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Today we will be exploring Building, Breaking and fixing a website with SQL Injection.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="setting-up-your-environment"><a class="header" href="#setting-up-your-environment">Setting Up Your Environment</a></h1>
+<p>We are going to create a safe, isolated space for this project using a <em>virtual environment</em></p>
+<h2 id="1-create-your-project-folder"><a class="header" href="#1-create-your-project-folder">1. Create your project folder</a></h2>
+<p>Pick a safe location to store your work.</p>
+<p>Inside of this folder, create an <code>sqli-lab</code> folder.</p>
+<h2 id="2-install-python-if-you-have-not-already"><a class="header" href="#2-install-python-if-you-have-not-already">2. Install Python (if you have not already)</a></h2>
+<p>Open your web browser and go to <a href="https://www.python.org/downloads/">python.org/downloads</a> and download the latest stable version of Python for your OS.</p>
+<blockquote class="blockquote-tag blockquote-tag-important">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p>
+<p><strong>Windows Users:</strong> When running the installer, make sure to check the box that says <code>Add python.exe to PATH</code> before clicking install. This is the most common cause of issues for beginners!</p>
+</blockquote>
+<h2 id="3-verify-python-is-installed"><a class="header" href="#3-verify-python-is-installed">3. Verify Python is installed</a></h2>
+<p>Open your terminal and type the following command. Press <code>Enter</code> after typing it.</p>
+<p>=== “Windows (PowerShell)”</p>
+<pre><code class="language-powershell">python --version
+</code></pre>
+<p>=== “macOS/Linux (Terminal)”</p>
+<pre><code class="language-bash">python3 --version
+</code></pre>
+<p>You should see something along the lines of <code>Python 3.XX.X</code>. If you get an error, see <a href="#troubleshooting">Troubleshooting</a>.</p>
+<h2 id="4-create-and-open-your-project-with-vs-code-recommended"><a class="header" href="#4-create-and-open-your-project-with-vs-code-recommended">4. Create and open your project with VS Code (Recommended)</a></h2>
+<ol>
+<li>Open Visual Studio Code</li>
+<li>Go to <code>File &gt; Open Folder</code></li>
+<li>Open the <code>sqli-lab</code> folder that you just created.</li>
+<li>Open a new terminal inside of VS Code (<code>Terminal &gt; New Terminal</code>)</li>
+</ol>
+<p>Your terminal should now be opened inside of your <code>sqli-lab</code> folder.</p>
+<h2 id="checkpoint-1"><a class="header" href="#checkpoint-1">Checkpoint 1</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> I can run <code>python --version</code> (Windows) or <code>python3 --version</code> (macOS/Linux) and see a version number.</li>
+<li><input disabled="" type="checkbox"> I have opened my <code>sqli-lab</code> folder in VS Code.</li>
+<li><input disabled="" type="checkbox"> I have a terminal open inside of it.</li>
+</ul>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>What is a virtual environment? It’s like a clean room for this project. Any packages that we install (like Flask) will only exist for <em>this</em> lab, and won’t interfere with any other Python projects on your computer!</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="building-the-lab-application"><a class="header" href="#building-the-lab-application">Building The Lab Application</a></h1>
+<p>Now for the fun part, building our app.</p>
+<h2 id="1-create-the-project-structure"><a class="header" href="#1-create-the-project-structure">1. Create the project structure</a></h2>
+<p>In your terminal, create the folders and files for our project.</p>
+<p>Create the following folder structure:</p>
+<pre><code class="language-text">    sqli-lab/
+    ├── instance/     (Will hold our database file)
+    ├── static/
+    │   └── css/      (Styles for our page)
+    └── templates/    (HTML for our page)
+</code></pre>
+<h2 id="2-create-a-virtual-environment"><a class="header" href="#2-create-a-virtual-environment">2. Create a Virtual Environment</a></h2>
+<p>=== “Windows (PowerShell)”</p>
+<pre><code class="language-powershell">python -m venv .venv
+</code></pre>
+<p>=== “macOS/Linux (Terminal)”</p>
+<pre><code class="language-bash">python3 -m venv .venv
+</code></pre>
+<p>This creates a <code>.venv</code> folder. This is our “clean room”.</p>
+<h2 id="3-activate-the-virtual-environment"><a class="header" href="#3-activate-the-virtual-environment">3. Activate the Virtual Environment</a></h2>
+<p>We must activate it every time we want to run this project in a new terminal.</p>
+<p>=== “Windows (PowerShell)”</p>
+<pre><code class="language-powershell">.\.venv\Scripts\activate
+</code></pre>
+<p>=== “macOS/Linux (Terminal)”</p>
+<pre><code class="language-bash">source .venv/bin/activate
+</code></pre>
+<p>When activated, you should see <code>(.venv)</code> at the beginning of your terminal line. This means it is working!</p>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>If you get an error on Windows about script execution being disabled, see the <a href="#troubleshooting">Troubleshooting</a> section for the fix.</p>
+</blockquote>
+<h2 id="4-create-the-requirements"><a class="header" href="#4-create-the-requirements">4. Create the requirements</a></h2>
+<p>Create a file named <code>requirements.txt</code> inside of <code>sqli-lab/</code>. Copy and paste this into it.</p>
+<pre><code class="language-txt">Flask==3.0.3
+gunicorn==23.0.0
+</code></pre>
+<p>What is this? This tells Python which packages to install. Flask is the web framework that we are using to make our website.</p>
+<p>Install them with the following command:</p>
+<pre><code class="language-bash">pip install -r requirements.txt
+</code></pre>
+<p>You should see output showing Flask and its dependencies being installed.</p>
+<h2 id="5-create-the-files"><a class="header" href="#5-create-the-files">5. Create the files</a></h2>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>Read the comments in the code! They are extremely important for this lab. We have marked the vulnerable parts very explicitly.</p>
+</blockquote>
+<h3 id="init_dbpy"><a class="header" href="#init_dbpy"><code>init_db.py</code></a></h3>
+<p>Create this file in <code>sqli-lab/</code>. This creates our database and adds test users to it.</p>
+<pre><code class="language-python">import sqlite3
+import os
+
+DB_PATH = os.path.join("instance", "users.db")
+os.makedirs("instance", exist_ok=True)
+
+conn = sqlite3.connect(DB_PATH)
+cur = conn.cursor()
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+)
+""")
+
+# Clear old data for repeatable demos
+cur.execute("DELETE FROM users")
+
+# Seed a known user
+cur.execute("INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)", ("admin", "supersecret123"))
+cur.execute("INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)", ("test", "password123"))
+
+conn.commit()
+conn.close()
+
+print(f"[+] Database initialized at {DB_PATH}")
+print("[+] Users created: admin / test")
+</code></pre>
+<p><em>Explanation:</em> This creates a table called <code>users</code> with <code>id</code>, <code>username</code> and <code>password</code>. It creates two test accounts for us to use.</p>
+<h3 id="apppy"><a class="header" href="#apppy"><code>app.py</code></a></h3>
+<p>Create this file in <code>sqli-lab/</code>. This is our web application.</p>
+<pre><code class="language-python">import os
+import sqlite3
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+DB_PATH = os.path.join("instance", "users.db")
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    error = None
+    query_shown = None
+
+    if request.method == "POST":
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+
+        query = f"SELECT id, username FROM users WHERE username = '{username}' AND password = '{password}'"
+        query_shown = query
+
+        try:
+            cur.execute(query)
+            user = cur.fetchone()
+        except Exception as e:
+            error = f"SQL Error: {e}"
+            user = None
+        finally:
+            conn.close()
+
+        if user:
+            return render_template("login.html", success=f"Logged in as {user[1]} (id={user[0]})", query=query_shown)
+        else:
+            if not error:
+                error = "Invalid username or password."
+            return render_template("login.html", error=error, query=query_shown)
+
+    return render_template("login.html")
+
+if __name__ == "__main__":
+    # Only for local testing
+    app.run(debug=True)
+</code></pre>
+<h3 id="templatesloginhtml"><a class="header" href="#templatesloginhtml"><code>templates/login.html</code></a></h3>
+<p>Create this file in <code>sqli-lab/templates/</code>.</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;SQLi Demo - Login&lt;/title&gt;
+    &lt;link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;main class="container"&gt;
+        &lt;header&gt;
+            &lt;h1&gt;SQL Injection Demo&lt;/h1&gt;
+            &lt;p class="warning"&gt;FOR EDUCATIONAL USE ONLY – Run locally in a lab environment.&lt;/p&gt;
+        &lt;/header&gt;
+
+        &lt;section class="card"&gt;
+            &lt;h2&gt;Login&lt;/h2&gt;
+            &lt;form method="POST" action="/"&gt;
+                &lt;label for="username"&gt;Username&lt;/label&gt;
+                &lt;input type="text" id="username" name="username" autocomplete="off" required&gt;
+
+                &lt;label for="password"&gt;Password&lt;/label&gt;
+                &lt;input type="text" id="password" name="password" autocomplete="off" required&gt;
+
+                &lt;button type="submit"&gt;Login&lt;/button&gt;
+            &lt;/form&gt;
+
+            {% if error %}
+                &lt;div class="alert error"&gt;{{ error }}&lt;/div&gt;
+            {% endif %}
+
+            {% if success %}
+                &lt;div class="alert success"&gt;{{ success }}&lt;/div&gt;
+            {% endif %}
+
+            {% if query %}
+                &lt;details class="query-box" open&gt;
+                    &lt;summary&gt;Executed SQL Query (shown for learning)&lt;/summary&gt;
+                    &lt;code&gt;{{ query }}&lt;/code&gt;
+                &lt;/details&gt;
+            {% endif %}
+        &lt;/section&gt;
+
+        &lt;section class="card"&gt;
+            &lt;h2&gt;Try these payloads (Only on this local lab)&lt;/h2&gt;
+            &lt;ul&gt;
+                &lt;li&gt;&lt;code&gt;admin' --&lt;/code&gt; in username, anything in password (comment out password check)&lt;/li&gt;
+                &lt;li&gt;&lt;code&gt;' OR '1'='1' --&lt;/code&gt; in username, anything in password (always true)&lt;/li&gt;
+                &lt;li&gt;&lt;code&gt;' OR 1=1 LIMIT 1 --&lt;/code&gt; similar effect&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p&gt;Watch the "Executed SQL Query" block to see how your input changes it.&lt;/p&gt;
+        &lt;/section&gt;
+    &lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h3 id="staticcssstylecss"><a class="header" href="#staticcssstylecss"><code>static/css/style.css</code></a></h3>
+<p>Create this file in <code>sqli-lab/static/css/</code>.</p>
+<pre><code class="language-css">:root {
+    --bg: #0f1026;
+    --card: #1d1f33;
+    --text: #f4f4f9;
+    --subtle: #b8b8d1;
+    --error: #ff5f5f;
+    --success: #3fb984;
+    --border: #2f315c;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #2a2d5a, var(--bg));
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+header {
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 0.25rem;
+}
+
+.warning {
+    color: #ffb86c;
+    margin: 0;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 40px 60px -40px rgba(63, 185, 132, 0.25);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.card h2 {
+    margin: 0;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+label {
+    font-weight: 600;
+}
+
+input {
+    padding: 0.7rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: rgba(15, 16, 38, 0.8);
+    color: var(--text);
+}
+
+input:focus {
+    outline: none;
+    border-color: rgba(63, 185, 132, 0.8);
+}
+
+button {
+    margin-top: 0.5rem;
+    padding: 0.8rem;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(90deg, #3fb984, #22d3ee);
+    color: var(--bg);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.alert {
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.error {
+    background: rgba(255, 95, 95, 0.15);
+    color: var(--error);
+}
+
+.success {
+    background: rgba(63, 185, 132, 0.18);
+    color: var(--success);
+}
+
+.query-box {
+    background: rgba(15, 16, 38, 0.8);
+    border-radius: 8px;
+    border: input border 1px solid var(--border);
+    padding: 1rem;
+}
+
+.query-box code {
+    display: block;
+    margin-top: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--subtle);
+}
+
+ul {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+code {
+    font-family: "Cascadia Code", "Fira Code", monospace;
+}
+</code></pre>
+<h2 id="checkpoint-2"><a class="header" href="#checkpoint-2">Checkpoint 2</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> All files have been created in <code>sqli-lab/</code></li>
+<li><input disabled="" type="checkbox"> I have activated my virtual environment (<code>(.venv)</code>)</li>
+<li><input disabled="" type="checkbox"> <code>pip install -r requirements.txt</code> has completed without errors</li>
+<li><input disabled="" type="checkbox"> I can see all of the files inside of VS Code</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="running-the-app-for-the-first-time"><a class="header" href="#running-the-app-for-the-first-time">Running The App For The First Time</a></h1>
+<p>Now that we’ve built everything, let’s initialize the database and run the app for the first time.</p>
+<h2 id="1-initialize-the-database"><a class="header" href="#1-initialize-the-database">1. Initialize the database</a></h2>
+<p>Make sure that you are still in the <code>sqli-lab/</code> directory and your virtual environment is activated.</p>
+<pre><code class="language-bash">python init_db.py
+</code></pre>
+<p>You should see the following output:</p>
+<pre><code class="language-text">[+] Database initialized at instance\users.db  (Windows)
+[+] Database initialized at instance/users.db   (macOS/Linux)
+[+] Users created: admin / test
+</code></pre>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p>If <code>instance/users.db</code> appears in your file explorer now, that’s correct! Do not share this file or commit it anywhere public.</p>
+</blockquote>
+<h2 id="2-start-the-web-server"><a class="header" href="#2-start-the-web-server">2. Start the web server</a></h2>
+<p>Now run the app:</p>
+<pre><code class="language-bash">python app.py
+</code></pre>
+<p>You should see output similar to this:</p>
+<pre><code class="language-text"> * Running on http://127.0.0.1:5000
+ * Debug mode: on
+</code></pre>
+<blockquote class="blockquote-tag blockquote-tag-important">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p>
+<p>While this is running, your terminal is <em>locked</em> into this server. Do not close this terminal yet. If you need to run other commands, open a <em>new</em> terminal in VS Code and activate your virtual environment again.</p>
+</blockquote>
+<h2 id="3-open-it-in-your-browser"><a class="header" href="#3-open-it-in-your-browser">3. Open it in your browser</a></h2>
+<p>Open your web browser and go to <a href="http://127.0.0.1:5000">http://127.0.0.1:5000</a>.</p>
+<p>You should see the “SQL Injection Demo” login page, complete with the payload examples at the bottom.</p>
+<h2 id="4-test-a-normal-login"><a class="header" href="#4-test-a-normal-login">4. Test a normal login</a></h2>
+<p>Try the valid credentials:</p>
+<ul>
+<li>Username: <code>admin</code></li>
+<li>Password: <code>supersecret123</code></li>
+</ul>
+<p>You should be greeted with a success message and the “Executed SQL Query” box will display the query that was ran.</p>
+<p>Now try logging in with incorrect credentials (e.g <code>admin</code> and <code>wrongpassword</code>). You should see “Invalid username or password.”</p>
+<h2 id="checkpoint-3"><a class="header" href="#checkpoint-3">Checkpoint 3</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> <code>init_db.py</code> ran successfully and created the database</li>
+<li><input disabled="" type="checkbox"> The server is running on <code>http://127.0.0.1:5000</code></li>
+<li><input disabled="" type="checkbox"> I can login with <code>admin</code> / <code>supersecret123</code> and get a success message</li>
+<li><input disabled="" type="checkbox"> I can see the executed SQL query in the query box</li>
+</ul>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>To stop the server at any time, go back to the terminal that it is running in and press <code>Ctrl + C</code>.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="exploiting-our-application"><a class="header" href="#exploiting-our-application">Exploiting our Application</a></h1>
+<h2 id="prediction-exercise"><a class="header" href="#prediction-exercise">Prediction Exercise</a></h2>
+<p>Before trying any payload, answer this to yourself.</p>
+<blockquote>
+<p>If I type <code>test</code> as the username and <code>password123</code> as the password, what would the query look like based off of <code>app.py</code>’s vulnerable line?</p>
+</blockquote>
+<p>Take a look back at the line: <code>f"SELECT id, username FROM users WHERE username = '{username}' AND password = '{password}'"</code></p>
+<p>With <code>test</code> and <code>password123</code> it would become:</p>
+<pre><code class="language-sql">SELECT id, username FROM users WHERE username = 'test' AND password = 'password123'
+</code></pre>
+<p>This matches! The single quotes are added by our code, and our input goes inside of them. This is the key.</p>
+<h2 id="exploit-1-comment-out-the-rest-of-the-query---"><a class="header" href="#exploit-1-comment-out-the-rest-of-the-query---">Exploit 1: Comment out the rest of the query (<code>--</code>)</a></h2>
+<p>The SQL comment <code>--</code> will tell the database to ignore everything after it on that line.</p>
+<ol>
+<li>Go to the login page.</li>
+<li>For Username, type: <code>admin' --</code></li>
+<li>For Password, type: <code>anything</code> (it doesn’t matter, it will be commented out!)</li>
+<li>Click Login</li>
+</ol>
+<h3 id="observe"><a class="header" href="#observe">Observe</a></h3>
+<p>Look at the query box. It should look something like this:</p>
+<pre><code class="language-sql">SELECT id, username FROM users WHERE username = 'admin' -- ' AND password = 'anything'
+</code></pre>
+<p>See what happened? Our input injected <code>admin'</code> which closed the username’s quote, and <code>--</code> commented out <code> AND password = '...'</code>. The password check has been completely removed! Because of this, we are logged in as <code>admin</code> without knowing the password.</p>
+<h3 id="what-happened-breakdown"><a class="header" href="#what-happened-breakdown">What happened (Breakdown)</a></h3>
+<ul>
+<li>Original structure: <code>WHERE username = '...input...' AND password = '...input...'</code></li>
+<li>We made it: <code>WHERE username = 'admin'</code> followed by a comment, so the <code>AND password = ...</code> is ignored by the database.</li>
+</ul>
+<h2 id="exploit-2-make-the-condition-always-true-or-11"><a class="header" href="#exploit-2-make-the-condition-always-true-or-11">Exploit 2: Make the condition always true (<code>OR '1'='1'</code>)</a></h2>
+<p>This is one of the most famous payloads. <code>'1'='1'</code> is always true in SQL.</p>
+<ol>
+<li>Clear the form (refresh the page)</li>
+<li>For Username, type: <code>' OR '1'='1' --</code></li>
+<li>For Password, type: <code>anything</code></li>
+<li>Click Login</li>
+</ol>
+<h3 id="observe-1"><a class="header" href="#observe-1">Observe</a></h3>
+<p>Your query should look similar to this:</p>
+<pre><code class="language-sql">SELECT id, username FROM users WHERE username = '' OR '1'='1' -- ' AND password = 'anything'
+</code></pre>
+<p>The <code>WHERE</code> clause is now <code>(username = '') OR ('1'='1')</code>. <code>'1'='1'</code> is always true, so this condition is true for <em>at least</em> the first row that it finds. Depending on how the database returns it, this will often log us in (in this case it will authenticate as a user).</p>
+<h3 id="what-happened-breakdown-1"><a class="header" href="#what-happened-breakdown-1">What happened (Breakdown)</a></h3>
+<ul>
+<li>We closed the quotes with <code>'</code>, added <code>OR '1'='1'</code> which makes the logic always evaluate to true.</li>
+<li>We commented out the rest with <code>--</code> to ignore the password check entirely.</li>
+</ul>
+<h2 id="exercise-time"><a class="header" href="#exercise-time">Exercise Time</a></h2>
+<p>Before moving onto the fixes, try to answer these questions. Do not look up the answers, reason them out by looking at the query box!</p>
+<ol>
+<li>Why did <code>admin' --</code> work, even though we put garbage into the password field?</li>
+<li>Why does <code>'1'='1'</code> make the login succeed?</li>
+<li>If I change the payload to <code>' OR '1'='0' --</code>, would it succeed or fail? Try it and see! (Predict first, then test.)</li>
+</ol>
+<h2 id="checkpoint-4"><a class="header" href="#checkpoint-4">Checkpoint 4</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> I was able to log in as admin without the password using <code>admin' --</code></li>
+<li><input disabled="" type="checkbox"> I was able to bypass the login using <code>' OR '1'='1' --</code></li>
+<li><input disabled="" type="checkbox"> I have looked at the query box for both payloads and can explain, in my own words, <em>why</em> the query changed</li>
+<li><input disabled="" type="checkbox"> I have attempted the prediction exercise above</li>
+</ul>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>Take a moment to appreciate what we just did. This is the bug in action. The fix is to make it so that no matter what somebody types, it <em>can never</em> change the structure of the SQL query. This is exactly what parameterized queries do.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="fixing-it-v1"><a class="header" href="#fixing-it-v1">Fixing It v1</a></h1>
+<p>For every attempt, make the change to <code>app.py</code>, restart the server (<code>Ctrl+C</code> and <code>python app.py</code> again), test your payloads, and document the result.</p>
+<h2 id="attempt-1-blacklist-dangerous-keywords-or-----union"><a class="header" href="#attempt-1-blacklist-dangerous-keywords-or-----union">Attempt 1: Blacklist dangerous keywords (<code>OR</code>, <code>--</code>, <code>;</code>, <code>UNION</code>)</a></h2>
+<p><em>Idea:</em> If I block the words that are used in the payloads, they can’t work.</p>
+<h3 id="change-apppy-revert-attempt-1-first-or-just-change-it"><a class="header" href="#change-apppy-revert-attempt-1-first-or-just-change-it">Change <code>app.py</code> (Revert attempt 1 first, or just change it)</a></h3>
+<p>Revert the <code>replace</code> lines first. Now add a check:</p>
+<pre><code class="language-python">        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+
+        # INCORRECT FIX - DEMO ONLY
+        blacklist = ["OR", "or", "UNION", "union", "--", ";", "#", "/*", "*/"]
+        combined = username + password
+        for word in blacklist:
+            if word in combined:
+                error = "Invalid input detected!"
+                return render_template("login.html", error=error)
+        
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+
+        query = f"SELECT id, username FROM users WHERE username = '{username}' AND password = '{password}'"
+        ...
+</code></pre>
+<h3 id="test-it"><a class="header" href="#test-it">Test it</a></h3>
+<p>Try <code>' OR '1'='1' --</code> again.</p>
+<p>You will get “Invalid input detected!” for this specific payload. However, there are ways to bypass this.</p>
+<h3 id="any-ideas-on-how-we-might-get-around-this"><a class="header" href="#any-ideas-on-how-we-might-get-around-this">Any ideas on how we might get around this?</a></h3>
+<p>Take some time, think about what exactly is being blocked and what might not be.
+Maybe this fix isn’t as safe as we first thought?</p>
+<p>Wait here until we are all ready to move forward.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="breaking-it-v1"><a class="header" href="#breaking-it-v1">Breaking It V1</a></h1>
+<h2 id="bypass-it-maybe-that-was-a-bad-fix"><a class="header" href="#bypass-it-maybe-that-was-a-bad-fix">Bypass it (maybe that was a bad fix)</a></h2>
+<p>Try obfuscating the <code>OR</code>. For example:</p>
+<p><code>' oR '1'='1 </code></p>
+<h2 id="further-reasons-why-that-is-a-bad-fix"><a class="header" href="#further-reasons-why-that-is-a-bad-fix">Further reasons why that is a bad fix</a></h2>
+<ul>
+<li><strong>There are infinite payloads.</strong> An attacker can find <em>any</em> variation to bypass a blacklist.</li>
+<li><strong>False positives:</strong> If a legitimate user had <code>or</code> in their password (uncommon, but possible), they would be blocked.</li>
+<li><strong>Obfuscation:</strong> Comments <code>/**/</code>, encoding, or different syntax can all be used to bypass it.</li>
+</ul>
+<p>This is security through obscurity. It is trivial to get around with enough effort.</p>
+<h2 id="undo-your-changes"><a class="header" href="#undo-your-changes">Undo your changes</a></h2>
+<p>Before moving onto the correct fix, revert <code>app.py</code> back to its original vulnerable state (the one from Chapter 2) or just remove the “fixes” that we just added. We will be replacing the logic entirely in the next chapter.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="fixing-it-v2-parameterized-queries"><a class="header" href="#fixing-it-v2-parameterized-queries">Fixing It v2 (Parameterized Queries)</a></h1>
+<p>Now that we’ve proven why the incorrect fix failed, we’ll apply the correct, robust fix. This is the standard that should be used in any application that talks to a database.</p>
+<blockquote class="blockquote-tag blockquote-tag-important">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p>
+<p>The fix is to <strong>stop concatenating user input into the query</strong> and instead, <strong>pass it separately</strong> to the database driver to be safely parameterized.</p>
+</blockquote>
+<h2 id="the-fix"><a class="header" href="#the-fix">The Fix</a></h2>
+<p>We will be using <code>sqlite3</code>’s <code>?</code> placeholder for parameterized queries.</p>
+<h3 id="change-apppy"><a class="header" href="#change-apppy">Change <code>app.py</code></a></h3>
+<p>Replace the entire vulnerable login logic with this correct version.</p>
+<pre><code class="language-python">import os
+import sqlite3
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+DB_PATH = os.path.join("instance", "users.db")
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    error = None
+    query_shown = None
+
+    if request.method == "POST":
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+
+        # CORRECT: Use parameterized queries (prepared statements)
+        # The SQL structure is fixed. User input is passed as data.
+        query = "SELECT id, username FROM users WHERE username = ? AND password = ?"
+        query_shown = query  # For learning purposes only, no user input is concatenated here
+
+        try:
+            # Pass the values as a tuple. The driver safely handles them.
+            cur.execute(query, (username, password))
+            user = cur.fetchone()
+        except Exception as e:
+            # For a lab this is okay to show, however see Chapter 9 for production advice
+            error = f"SQL Error: {e}"
+            user = None
+        finally:
+            conn.close()
+
+        if user:
+            return render_template("login.html", success=f"Logged in as {user[1]} (id={user[0]})", query=query_shown)
+        else:
+            if not error:
+                error = "Invalid username or password."
+            return render_template("login.html", error=error, query=query_shown)
+
+    return render_template("login.html")
+
+if __name__ == "__main__":
+    # Only for local testing
+    app.run(debug=True)
+</code></pre>
+<h3 id="whats-different"><a class="header" href="#whats-different">What’s different?</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Vulnerable</th><th style="text-align: left">Correct</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>query = f"... '{username}' ... '{password}' ..."</code> and <code>cur.execute(query)</code></td><td style="text-align: left"><code>query = "... ? ... ?"</code> and <code>cur.execute(query, (username, password))</code></td></tr>
+<tr><td style="text-align: left">User input is glued into the SQL string.</td><td style="text-align: left">User input is sent separately as parameters. The database treats it as data, not code.</td></tr>
+<tr><td style="text-align: left">Attackers can change the query’s structure.</td><td style="text-align: left">The query’s structure is fixed. No matter what characters are put in, they cannot alter <code>WHERE</code>, add <code>OR</code>, or add comments to change logic.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="test-the-fix"><a class="header" href="#test-the-fix">Test the fix</a></h2>
+<ol>
+<li>Save <code>app.py</code></li>
+<li>Stop the server if it’s running (<code>Ctrl+C</code>) and start it again (<code>python app.py</code>)</li>
+<li>Go to <a href="http://127.0.0.1:5000">http://127.0.0.1:5000</a></li>
+</ol>
+<h3 id="test-1-normal-login-still-works"><a class="header" href="#test-1-normal-login-still-works">Test 1: Normal login still works</a></h3>
+<p>Login with <code>admin</code> / <code>supersecret123</code>. This should still succeed. The functionality is preserved!</p>
+<h3 id="test-2-the-payloads-now-fail"><a class="header" href="#test-2-the-payloads-now-fail">Test 2: The payloads now fail</a></h3>
+<p>Try <code>admin' --</code> with any password. It will fail with “Invalid username or password.”</p>
+<p>Try <code>' OR '1'='1' --</code> with any password. It will fail.</p>
+<h3 id="observe-the-query-box"><a class="header" href="#observe-the-query-box">Observe the query box</a></h3>
+<p>The query box will now show:</p>
+<pre><code class="language-sql">SELECT id, username FROM users WHERE username = ? AND password = ?
+</code></pre>
+<p>Notice that there is <em>no</em> user input inside of it at all. The database is doing the substitution safely behind the scenes. This is correct!</p>
+<h3 id="bonus-test-quotes-are-now-safe"><a class="header" href="#bonus-test-quotes-are-now-safe">Bonus Test (Quotes are now safe!)</a></h3>
+<p>Try using a password with a single quote if you wanted to (for example, if you changed the database, but we can also just observe). With parameterization, quotes are treated as a normal character, not a string delimiter. This means our users can have safe, normal passwords without us breaking anything.</p>
+<h2 id="checkpoint-5"><a class="header" href="#checkpoint-5">Checkpoint 5</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> I have replaced the vulnerable logic with parameterized queries</li>
+<li><input disabled="" type="checkbox"> Normal login (<code>admin</code>/<code>supersecret123</code>) still works</li>
+<li><input disabled="" type="checkbox"> <code>admin' --</code> no longer bypasses the login</li>
+<li><input disabled="" type="checkbox"> <code>' OR '1'='1' --</code> no longer bypasses the login</li>
+<li><input disabled="" type="checkbox"> The query shown is <code>... username = ? AND password = ?</code> with no concatenated user input</li>
+<li><input disabled="" type="checkbox"> I can explain why this prevents SQL Injection (data vs code)</li>
+</ul>
+<blockquote>
+<p>[!SUCCESS]
+Congratulations! You’ve fixed the root cause. This is the most important takeaway from this lab. Wherever user input meets a database query, you want to use parameterized queries (or a secure ORM that uses them under the hood).</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="hardening-and-best-practices"><a class="header" href="#hardening-and-best-practices">Hardening and Best Practices</a></h1>
+<p>Parameterization fixes SQL Injection. However, a real login system needs more layers of defense. Here are beginner-friendly best practices to be aware of for future projects.</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>We won’t be implementing all of these into this lab (as to not overcomplicate it), however it’s critical to know about them.</p>
+</blockquote>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Practice</th><th style="text-align: left">Why?</th><th style="text-align: left">Beginner Example</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Hash passwords</strong></td><td style="text-align: left">If your database ever gets leaked, plain text passwords are exposed to everyone.</td><td style="text-align: left">Use <code>werkzeug.security.generate_password_hash()</code> and <code>check_password_hash()</code> when storing and verifying passwords.</td></tr>
+<tr><td style="text-align: left"><strong>Don’t leak SQL errors</strong></td><td style="text-align: left">Showing <code>SQL Error: ...</code> to users can reveal information about your database structure (table names, schema, etc) to attackers.</td><td style="text-align: left">Log the error to your server console, and show a generic error to the user (e.g “Something went wrong. Please try again.”).</td></tr>
+<tr><td style="text-align: left"><strong>Use the principle of least privilege</strong></td><td style="text-align: left">The database user that your app connects with should only be able to do what it <em>needs</em> to do.</td><td style="text-align: left">If your app only needs to read users for login, don’t give it permission to <code>DELETE</code>, <code>DROP TABLE</code>, or create users.</td></tr>
+<tr><td style="text-align: left"><strong>Rate limiting</strong></td><td style="text-align: left">Prevents brute force attacks where someone tries to guess passwords over and over again.</td><td style="text-align: left">Tools like <code>Flask-Limiter</code> can limit how many login attempts a user/IP can make within a time window.</td></tr>
+<tr><td style="text-align: left"><strong>Use ORMs</strong></td><td style="text-align: left">Object Relational Mappers (like SQLAlchemy) use parameterized queries by default and make it much harder to accidentally concatenate.</td><td style="text-align: left">Great “next step” once you’re more comfortable with Python and SQL.</td></tr>
+<tr><td style="text-align: left"><strong>Consider MFA</strong></td><td style="text-align: left">Multi-Factor Authentication adds another layer of security even if a password is guessed or leaked.</td><td style="text-align: left">Beyond the scope of this lab, but incredibly important.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="quick-exercise"><a class="header" href="#quick-exercise">Quick Exercise</a></h2>
+<p>Look at our fixed <code>app.py</code>. Find the line where we do <code>error = f"SQL Error: {e}"</code>.</p>
+<blockquote class="blockquote-tag blockquote-tag-warning">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Warning</p>
+<p>For a production application, change this to log the error server-side (e.g <code>print(e)</code> or a proper logger) and return something like <code>error = "An unexpected error occurred."</code> to the user.</p>
+</blockquote>
+<p>You don’t have to change it for this local lab if you want to keep debugging easy, however it’s good to be aware of this.</p>
+<h2 id="checkpoint-6"><a class="header" href="#checkpoint-6">Checkpoint 6</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> I know why plain text passwords are dangerous</li>
+<li><input disabled="" type="checkbox"> I know why exposing SQL errors is dangerous</li>
+<li><input disabled="" type="checkbox"> I know that parameterization isn’t the <em>only</em> thing to do, it’s the fix for <em>SQL Injection</em></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="wrap-up-ethics--next-steps"><a class="header" href="#wrap-up-ethics--next-steps">Wrap Up, Ethics &amp; Next Steps</a></h1>
+<h2 id="what-weve-accomplished"><a class="header" href="#what-weve-accomplished">What we’ve accomplished</a></h2>
+<p>You did it! You went from building the lab, all the way to fixing the vulnerability. Let’s recap:</p>
+<ul>
+<li><strong>Understood the bug:</strong> String concatenation allows user input to change SQL query structure.</li>
+<li><strong>Exploited it safely:</strong> Saw how <code>--</code> and <code>OR '1'='1'</code> can bypass authentication in a local lab.</li>
+<li><strong>Tested incorrect fixes:</strong> Proved that escaping, blacklisting, and whitelisting are not robust solutions.</li>
+<li><strong>Fixed it correctly:</strong> Used parameterized queries to separate code and data, preventing SQLi.</li>
+<li><strong>Learned defense in depth:</strong> Looked at hardening practices for the future.</li>
+</ul>
+<h2 id="ethics-reminder-read-again"><a class="header" href="#ethics-reminder-read-again">Ethics Reminder (Read again)</a></h2>
+<blockquote class="blockquote-tag blockquote-tag-warning">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Warning</p>
+<ul>
+<li><strong>Only use this knowledge for good.</strong> Find and fix vulnerabilities, don’t exploit ones you don’t have permission for.</li>
+<li><strong>Keep this local.</strong> Do not host the vulnerable version online.</li>
+<li><strong>Responsible disclosure:</strong> If you ever find a vulnerability in a real system, report it through the correct, authorized channel.</li>
+<li><strong>Follow the law:</strong> Unauthorized testing of systems is illegal in most jurisdictions.</li>
+</ul>
+</blockquote>
+<h2 id="cleanup-optional"><a class="header" href="#cleanup-optional">Cleanup (Optional)</a></h2>
+<p>If you’re done with the lab, you can clean up.</p>
+<ol>
+<li>Stop the server with <code>Ctrl+C</code></li>
+<li>Deactivate the virtual environment with <code>deactivate</code></li>
+<li>You can delete the entire <code>sqli-lab/</code> folder if you wish to remove it. The database (<code>instance/users.db</code>) and <code>__pycache__</code> will be deleted with it.</li>
+</ol>
+<h2 id="next-steps-to-learn-more"><a class="header" href="#next-steps-to-learn-more">Next Steps To Learn More</a></h2>
+<p>If you want to expand your knowledge, these are all free and beginner friendly resources:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Resource</th><th style="text-align: left">What it’s good for</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><a href="https://owasp.org/www-community/attacks/SQL_Injection">OWASP SQL Injection</a></td><td style="text-align: left">The industry standard explanation and prevention methods.</td></tr>
+<tr><td style="text-align: left"><a href="https://portswigger.net/web-security/sql-injection">PortSwigger Web Security Academy</a></td><td style="text-align: left">Interactive, in-browser labs that are incredibly well made. Start with their SQLi section!</td></tr>
+<tr><td style="text-align: left"><a href="https://flask.palletsprojects.com/">Flask Documentation</a></td><td style="text-align: left">To learn more about Flask and expand this application.</td></tr>
+<tr><td style="text-align: left"><a href="https://www.sqlite.org/docs.html">SQLite Documentation</a></td><td style="text-align: left">To learn more about the database that we used.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="final-challenge-optional-but-recommended"><a class="header" href="#final-challenge-optional-but-recommended">Final Challenge (Optional, but recommended)</a></h2>
+<p>Now that you know the fix, try to expand this lab yourself!</p>
+<ul>
+<li><input disabled="" type="checkbox"> Add a <code>/fixed</code> route that explicitly uses parameterized queries (to have vulnerable and fixed side by side)</li>
+<li><input disabled="" type="checkbox"> Add password hashing using <code>werkzeug.security</code></li>
+<li><input disabled="" type="checkbox"> Change the app to not display SQL errors to the user, only log them</li>
+<li><input disabled="" type="checkbox"> Add a new page that uses a <code>LIKE</code> query and fix it with parameterization (to see it works in different contexts)</li>
+</ul>
+<p>You now have the foundation to do all of these safely!</p>
+<blockquote>
+<p>[!SUCCESS]
+Great job completing this lab. Remember, the goal isn’t to be able to exploit, it’s to be able to build securely.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="glossary"><a class="header" href="#glossary">Glossary</a></h1>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Term</th><th style="text-align: left">Definition</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><strong>Blacklist</strong></td><td style="text-align: left">Trying to block specific words/characters. Not secure against SQLi.</td></tr>
+<tr><td style="text-align: left"><strong>Concatenation</strong></td><td style="text-align: left">Gluing strings together (e.g putting user input directly into a query). The root cause of this vulnerability.</td></tr>
+<tr><td style="text-align: left"><strong>Database</strong></td><td style="text-align: left">A structured collection of data (like our <code>users.db</code> file).</td></tr>
+<tr><td style="text-align: left"><strong>Debug Mode (<code>debug=True</code>)</strong></td><td style="text-align: left">A Flask setting for development that gives helpful errors. Never use in production.</td></tr>
+<tr><td style="text-align: left"><strong>Flask</strong></td><td style="text-align: left">A Python web framework used to make our website.</td></tr>
+<tr><td style="text-align: left"><strong>Injection</strong></td><td style="text-align: left">When untrusted input is interpreted as code instead of data.</td></tr>
+<tr><td style="text-align: left"><strong>Localhost / 127.0.0.1</strong></td><td style="text-align: left">Your own computer. The only place that this lab should ever be ran.</td></tr>
+<tr><td style="text-align: left"><strong>ORM (Object Relational Mapper)</strong></td><td style="text-align: left">A library that maps database tables to objects in code. Often uses parameterized queries by default.</td></tr>
+<tr><td style="text-align: left"><strong>Parameterization / Prepared Statement</strong></td><td style="text-align: left">Separating the SQL query structure from the data. The secure fix for SQLi.</td></tr>
+<tr><td style="text-align: left"><strong>Payload</strong></td><td style="text-align: left">Malicious input that is crafted to exploit a vulnerability.</td></tr>
+<tr><td style="text-align: left"><strong>Placeholder (<code>?</code>)</strong></td><td style="text-align: left">A symbol used in parameterized queries where data will be safely inserted.</td></tr>
+<tr><td style="text-align: left"><strong>Query</strong></td><td style="text-align: left">A request sent to a database (e.g <code>SELECT ... FROM ...</code>).</td></tr>
+<tr><td style="text-align: left"><strong>SQL (Structured Query Language)</strong></td><td style="text-align: left">The language used to communicate with databases.</td></tr>
+<tr><td style="text-align: left"><strong>SQL Injection (SQLi)</strong></td><td style="text-align: left">Injecting SQL code via user input due to string concatenation.</td></tr>
+<tr><td style="text-align: left"><strong>String</strong></td><td style="text-align: left">Text (e.g <code>"admin"</code>, <code>"password123"</code>).</td></tr>
+<tr><td style="text-align: left"><strong>Terminal / Command Line</strong></td><td style="text-align: left">A text based interface to run commands on your computer.</td></tr>
+<tr><td style="text-align: left"><strong>Virtual Environment (<code>venv</code>)</strong></td><td style="text-align: left">An isolated space to install packages for a specific project.</td></tr>
+<tr><td style="text-align: left"><strong>Whitelist</strong></td><td style="text-align: left">Only allowing specific, known good inputs. Can be okay for restriction, but isn’t the fix for SQLi on its own.</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="full-file-reference"><a class="header" href="#full-file-reference">Full File Reference</a></h1>
+<p>For your convenience, here are all of the files referenced throughout the book in one place. Use this to verify that your files match exactly.</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>All of these are for the <em>vulnerable</em> version that we built in chapter 4. Remember to replace <code>app.py</code> with the fixed version from chapter 8 after testing!</p>
+</blockquote>
+<h2 id="sqli-labrequirementstxt"><a class="header" href="#sqli-labrequirementstxt"><code>sqli-lab/requirements.txt</code></a></h2>
+<pre><code class="language-txt">Flask==3.0.3
+gunicorn==23.0.0
+</code></pre>
+<h2 id="sqli-labgitignore-recommended"><a class="header" href="#sqli-labgitignore-recommended"><code>sqli-lab/.gitignore</code> (Recommended)</a></h2>
+<pre><code class="language-txt">__pycache__/
+*.pyc
+*.db
+instance/
+.env
+venv/
+.venv/
+</code></pre>
+<h2 id="sqli-labinit_dbpy"><a class="header" href="#sqli-labinit_dbpy"><code>sqli-lab/init_db.py</code></a></h2>
+<pre><code class="language-python">import sqlite3
+import os
+
+DB_PATH = os.path.join("instance", "users.db")
+os.makedirs("instance", exist_ok=True)
+
+conn = sqlite3.connect(DB_PATH)
+cur = conn.cursor()
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+)
+""")
+
+cur.execute("DELETE FROM users")
+
+cur.execute("INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)", ("admin", "supersecret123"))
+cur.execute("INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)", ("test", "password123"))
+
+conn.commit()
+conn.close()
+
+print(f"[+] Database initialized at {DB_PATH}")
+print("[+] Users created: admin / test")
+</code></pre>
+<h2 id="sqli-labapppy-vulnerable---for-learning-only"><a class="header" href="#sqli-labapppy-vulnerable---for-learning-only"><code>sqli-lab/app.py</code> (Vulnerable - For learning only)</a></h2>
+<pre><code class="language-python">import os
+import sqlite3
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+DB_PATH = os.path.join("instance", "users.db")
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    error = None
+    query_shown = None
+
+    if request.method == "POST":
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+
+        query = f"SELECT id, username FROM users WHERE username = '{username}' AND password = '{password}'"
+        query_shown = query
+
+        try:
+            cur.execute(query)
+            user = cur.fetchone()
+        except Exception as e:
+            error = f"SQL Error: {e}"
+            user = None
+        finally:
+            conn.close()
+
+        if user:
+            return render_template("login.html", success=f"Logged in as {user[1]} (id={user[0]})", query=query_shown)
+        else:
+            if not error:
+                error = "Invalid username or password."
+            return render_template("login.html", error=error, query=query_shown)
+
+    return render_template("login.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+</code></pre>
+<h2 id="sqli-labapppy-fixed---correct"><a class="header" href="#sqli-labapppy-fixed---correct"><code>sqli-lab/app.py</code> (Fixed - Correct)</a></h2>
+<pre><code class="language-python">import os
+import sqlite3
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+DB_PATH = os.path.join("instance", "users.db")
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    error = None
+    query_shown = None
+
+    if request.method == "POST":
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+
+        query = "SELECT id, username FROM users WHERE username = ? AND password = ?"
+        query_shown = query
+
+        try:
+            cur.execute(query, (username, password))
+            user = cur.fetchone()
+        except Exception as e:
+            error = f"SQL Error: {e}"
+            user = None
+        finally:
+            conn.close()
+
+        if user:
+            return render_template("login.html", success=f"Logged in as {user[1]} (id={user[0]})", query=query_shown)
+        else:
+            if not error:
+                error = "Invalid username or password."
+            return render_template("login.html", error=error, query=query_shown)
+
+    return render_template("login.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+</code></pre>
+<h2 id="sqli-labtemplatesloginhtml"><a class="header" href="#sqli-labtemplatesloginhtml"><code>sqli-lab/templates/login.html</code></a></h2>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;SQLi Demo - Login&lt;/title&gt;
+    &lt;link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;main class="container"&gt;
+        &lt;header&gt;
+            &lt;h1&gt;SQL Injection Demo&lt;/h1&gt;
+            &lt;p class="warning"&gt;FOR EDUCATIONAL USE ONLY – Run locally in a lab environment.&lt;/p&gt;
+        &lt;/header&gt;
+
+        &lt;section class="card"&gt;
+            &lt;h2&gt;Login&lt;/h2&gt;
+            &lt;form method="POST" action="/"&gt;
+                &lt;label for="username"&gt;Username&lt;/label&gt;
+                &lt;input type="text" id="username" name="username" autocomplete="off" required&gt;
+
+                &lt;label for="password"&gt;Password&lt;/label&gt;
+                &lt;input type="text" id="password" name="password" autocomplete="off" required&gt;
+
+                &lt;button type="submit"&gt;Login&lt;/button&gt;
+            &lt;/form&gt;
+
+            {% if error %}
+                &lt;div class="alert error"&gt;{{ error }}&lt;/div&gt;
+            {% endif %}
+
+            {% if success %}
+                &lt;div class="alert success"&gt;{{ success }}&lt;/div&gt;
+            {% endif %}
+
+            {% if query %}
+                &lt;details class="query-box" open&gt;
+                    &lt;summary&gt;Executed SQL Query (shown for learning)&lt;/summary&gt;
+                    &lt;code&gt;{{ query }}&lt;/code&gt;
+                &lt;/details&gt;
+            {% endif %}
+        &lt;/section&gt;
+
+        &lt;section class="card"&gt;
+            &lt;h2&gt;Try these payloads (Only on this local lab)&lt;/h2&gt;
+            &lt;ul&gt;
+                &lt;li&gt;&lt;code&gt;admin' --&lt;/code&gt; in username, anything in password&lt;/li&gt;
+                &lt;li&gt;&lt;code&gt;' OR '1'='1' --&lt;/code&gt; in username, anything in password&lt;/li&gt;
+                &lt;li&gt;&lt;code&gt;' OR 1=1 LIMIT 1 --&lt;/code&gt; similar effect&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p&gt;Watch the "Executed SQL Query" block to see how your input changes it.&lt;/p&gt;
+        &lt;/section&gt;
+    &lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h2 id="sqli-labstaticcssstylecss"><a class="header" href="#sqli-labstaticcssstylecss"><code>sqli-lab/static/css/style.css</code></a></h2>
+<pre><code class="language-css">:root {
+    --bg: #0f1026;
+    --card: #1d1f33;
+    --text: #f4f4f9;
+    --subtle: #b8b8d1;
+    --error: #ff5f5f;
+    --success: #3fb984;
+    --border: #2f315c;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #2a2d5a, var(--bg));
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+header {
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 0.25rem;
+}
+
+.warning {
+    color: #ffb86c;
+    margin: 0;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 40px 60px -40px rgba(63, 185, 132, 0.25);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.card h2 {
+    margin: 0;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+label {
+    font-weight: 600;
+}
+
+input {
+    padding: 0.7rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: rgba(15, 16, 38, 0.8);
+    color: var(--text);
+}
+
+input:focus {
+    outline: none;
+    border-color: rgba(63, 185, 132, 0.8);
+}
+
+button {
+    margin-top: 0.5rem;
+    padding: 0.8rem;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(90deg, #3fb984, #22d3ee);
+    color: var(--bg);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.alert {
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.error {
+    background: rgba(255, 95, 95, 0.15);
+    color: var(--error);
+}
+
+.success {
+    background: rgba(63, 185, 132, 0.18);
+    color: var(--success);
+}
+
+.query-box {
+    background: rgba(15, 16, 38, 0.8);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 1rem;
+}
+
+.query-box code {
+    display: block;
+    margin-top: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--subtle);
+}
+
+ul {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+code {
+    font-family: "Cascadia Code", "Fira Code", monospace;
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h1>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Issue</th><th style="text-align: left">Possible Cause</th><th style="text-align: left">Fix</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>python</code> or <code>py</code> not found</td><td style="text-align: left">Python not installed or not added to PATH (Windows)</td><td style="text-align: left">Reinstall Python and check <code>Add python.exe to PATH</code>. Try <code>py</code> on Windows, <code>python3</code> on macOS/Linux.</td></tr>
+<tr><td style="text-align: left">Can’t activate venv on Windows (script execution disabled)</td><td style="text-align: left">PowerShell’s execution policy is blocking scripts</td><td style="text-align: left">Open PowerShell as your user and run: <code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code>. Then try activating again. Only do this for your user account.</td></tr>
+<tr><td style="text-align: left"><code>ModuleNotFoundError: No module named 'flask'</code></td><td style="text-align: left">Virtual environment not activated, or packages not installed</td><td style="text-align: left">Activate your venv (<code>(.venv)</code>) and run <code>pip install -r requirements.txt</code> again.</td></tr>
+<tr><td style="text-align: left">Port 5000 already in use</td><td style="text-align: left">Something else is running on port 5000</td><td style="text-align: left">Close the other program, or run Flask on a different port: <code>flask run --port 5001</code>. Remember to go to the new port in your browser.</td></tr>
+<tr><td style="text-align: left">Database errors</td><td style="text-align: left">Corrupted or missing database</td><td style="text-align: left">Delete <code>instance/users.db</code> and run <code>python init_db.py</code> again.</td></tr>
+<tr><td style="text-align: left">Page doesn’t load / connection refused</td><td style="text-align: left">Server not running</td><td style="text-align: left">Make sure the terminal with <code>python app.py</code> is still running and hasn’t crashed. Check for errors in that terminal.</td></tr>
+<tr><td style="text-align: left">Changes aren’t showing up</td><td style="text-align: left">Browser cache or server not restarted</td><td style="text-align: left">Hard refresh your browser (<code>Ctrl+Shift+R</code> or <code>Cmd+Shift+R</code>). If you changed <code>app.py</code>, restart the server with <code>Ctrl+C</code> and <code>python app.py</code> again.</td></tr>
+<tr><td style="text-align: left">Quotes being weird when copying payloads</td><td style="text-align: left">Smart quotes from some documents</td><td style="text-align: left">Always type the payloads exactly as shown in the book. Avoid copying from rich text documents, copy from the code blocks.</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="cheat-sheet"><a class="header" href="#cheat-sheet">Cheat Sheet</a></h1>
+<h2 id="commands"><a class="header" href="#commands">Commands</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Command</th><th style="text-align: left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>py -m venv .venv</code> (Win) / <code>python3 -m venv .venv</code> (Mac/Linux)</td><td style="text-align: left">Create virtual environment</td></tr>
+<tr><td style="text-align: left"><code>.\.venv\Scripts\activate</code> (Win) / <code>source .venv/bin/activate</code> (Mac/Linux)</td><td style="text-align: left">Activate virtual environment</td></tr>
+<tr><td style="text-align: left"><code>pip install -r requirements.txt</code></td><td style="text-align: left">Install dependencies</td></tr>
+<tr><td style="text-align: left"><code>python init_db.py</code></td><td style="text-align: left">Initialize database</td></tr>
+<tr><td style="text-align: left"><code>python app.py</code></td><td style="text-align: left">Run the web server</td></tr>
+<tr><td style="text-align: left"><code>Ctrl+C</code></td><td style="text-align: left">Stop the server</td></tr>
+<tr><td style="text-align: left"><code>deactivate</code></td><td style="text-align: left">Deactivate virtual environment</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="payloads-only-for-this-local-lab"><a class="header" href="#payloads-only-for-this-local-lab">Payloads (Only for this local lab)</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Payload</th><th style="text-align: left">Username Field</th><th style="text-align: left">Password Field</th><th style="text-align: left">Result</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left">Normal</td><td style="text-align: left"><code>admin</code></td><td style="text-align: left"><code>supersecret123</code></td><td style="text-align: left">Success (fixed)</td></tr>
+<tr><td style="text-align: left">Comment Out</td><td style="text-align: left"><code>admin' --</code></td><td style="text-align: left"><code>anything</code></td><td style="text-align: left">Bypasses (vulnerable only)</td></tr>
+<tr><td style="text-align: left">Always True</td><td style="text-align: left"><code>' OR '1'='1' --</code></td><td style="text-align: left"><code>anything</code></td><td style="text-align: left">Bypases (vulnerable only)</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="key-takeaway"><a class="header" href="#key-takeaway">Key Takeaway</a></h2>
+<pre><code class="language-python"># VULNERABLE
+query = f"SELECT ... WHERE username = '{username}' ..."
+cur.execute(query)
+
+# SECURE
+query = "SELECT ... WHERE username = ? AND password = ?"
+cur.execute(query, (username, password))
+</code></pre>
+<p><strong>Rule of thumb:</strong> If you ever find yourself using f-strings or string concatenation to build SQL with user input, stop and use parameterized queries instead.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-09f2665d.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-609e4cb8.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
